@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<head>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <title>Creative 2</title>
+</head>
+
+<body>
+  <h1>Star Wars Quiz</h1>
+  <div id='quiz-options'>
+    <button id='people-btn'>People</button>
+    <button id='starships-btn'>Starships</button>
+    <button id='species-btn'>Species</button>
+    <button id='planets-btn'>Planets</button>
+  </div>
+
+  <div id='quiz' style='display:none'>
+    Quiz
+  </div>
+  <button id='next' style='display:none'>Next</button>
+
+
+  <script>
+    var userSelection = '';
+
+    var people = ['eye_color', 'hair_color', 'height', 'mass', 'skin_color'];
+    var starships = ['cargo_capacity', 'manufacturer', 'length'];
+    var species = ['average_height', 'average_lifespan', 'language', 'classification'];
+    var planets = ['climate', 'diameter', 'terrain', 'population'];
+
+    $(document).ready(function() {
+      var numQuestions = 5;
+      var questions = [];
+      var questionsAsked = 0;
+      var questionsCorrect = 0;
+
+      function generateQ() {
+        $.getJSON('http://swapi.co/api/' + userSelection + '/', function(data) {
+          var index = Math.floor(Math.random() * data.results.length);
+          // console.log(index);
+
+          var type;
+          var attr;
+
+          if (userSelection === 'people') {
+            // for (var i = 0; i < numQuestions; i++) {
+              type = Math.floor(Math.random() * people.length);
+              attr = people[type];
+          }
+
+          if (userSelection === 'starships') {
+            type = Math.floor(Math.random() * starships.length);
+            attr = starships[type];
+          }
+
+          if (userSelection === 'species') {
+            type = Math.floor(Math.random() * species.length);
+            attr = species[type];
+          }
+
+          if (userSelection === 'planets') {
+            type = Math.floor(Math.random() * planets.length);
+            attr = planets[type];
+          }
+
+          var clean_attr = attr.replace('_', ' ');
+          // console.log(data.results[index]);
+          var question = 'What is the ' + clean_attr + ' of ' + data.results[index].name + '?';
+          // console.log(question);
+          var correct = data.results[index][attr];
+          var incorrect = [];
+          while (incorrect.length < 3) {
+            var temp = Math.floor(Math.random() * data.results.length);
+            //console.log(temp);
+            if (temp !== index) {
+              if (data.results[temp][attr] !== correct) incorrect.push(data.results[temp][attr]);
+            }
+            // console.log(incorrect);
+          }
+          questions.push({q: question, a: correct, w: incorrect});
+          $('#quiz').append('<p>' + question + '</p>');
+          $('#quiz').append('<button id=\'correct\'>' + correct + '</button>');
+          for (var i = 0; i < 3; i++) {
+            $('#quiz').append('<button class=\'incorrect\'>' + incorrect[i] + '</button>');
+          }
+
+          $('#correct').click(function() {
+            $('#next').show();
+            questionsCorrect++;
+            questionsAsked++;
+          });
+
+          $('.incorrect').click(function() {
+            $('#next').show();
+            questionsAsked++;
+          });
+        })
+      };
+
+      function startQuiz() {
+        generateQ();
+        console.log('start');
+        var count = 0;
+
+        $('#quiz').show();
+      }
+
+      $('#people-btn').click(function() {
+        userSelection = 'people';
+        $('#quiz-options').hide();
+        startQuiz();
+      });
+
+      $('#starships-btn').click(function() {
+        userSelection = 'starships';
+        $('#quiz-options').hide();
+        startQuiz();
+      });
+
+      $('#species-btn').click(function() {
+        userSelection = 'species';
+        $('#quiz-options').hide();
+        startQuiz();
+      });
+
+      $('#planets-btn').click(function() {
+        userSelection = 'planets';
+        $('#quiz-options').hide();
+        startQuiz();
+      });
+
+      $('#next').click(function() {
+        console.log('next');
+        $('#quiz').html('');
+        if (questionsAsked !== numQuestions) {
+          generateQ();
+          $('#next').hide();
+          console.log(questionsCorrect, questionsAsked);
+        }
+        else {
+          $('#quiz').html('<p>You\'re score is ' + questionsCorrect + ' out of ' + questionsAsked + '</p>');
+          $('#quiz').append('<p>Refresh the page to try a new quiz!');
+          $('#next').hide();
+        }
+      });
+
+
+    });
+  </script>
+</body>
