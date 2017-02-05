@@ -1,22 +1,29 @@
 <!DOCTYPE HTML>
 <head>
   <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <link rel="stylesheet" type="text/css" href="creative2.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <title>Creative 2</title>
 </head>
 
 <body>
-  <h1>Star Wars Quiz</h1>
-  <div id='quiz-options'>
-    <button id='people-btn'>People</button>
-    <button id='starships-btn'>Starships</button>
-    <button id='species-btn'>Species</button>
-    <button id='planets-btn'>Planets</button>
-  </div>
+  <div class="container text-center">
 
-  <div id='quiz' style='display:none'>
-    Quiz
+    <h1 class="title">Star Wars Quiz</h1>
+    <p id='main-page'>Choose a topic:</p>
+    <div id='quiz-options'>
+      <button id='people-btn' class="btn btn-success btn-lg">People</button>
+      <button id='starships-btn' class="btn btn-success btn-lg">Starships</button>
+      <button id='species-btn' class="btn btn-success btn-lg">Species</button>
+      <button id='planets-btn' class="btn btn-success btn-lg">Planets</button>
+    </div>
+
+    <div id='quiz' style='display:none'>
+      Quiz
+    </div>
+    <button id='next' class="next-btn btn btn-default btn-sm" style='display:none'>Next</button>
+
   </div>
-  <button id='next' style='display:none'>Next</button>
 
 
   <script>
@@ -36,15 +43,12 @@
       function generateQ() {
         $.getJSON('http://swapi.co/api/' + userSelection + '/', function(data) {
           var index = Math.floor(Math.random() * data.results.length);
-          // console.log(index);
-
           var type;
           var attr;
 
           if (userSelection === 'people') {
-            // for (var i = 0; i < numQuestions; i++) {
-              type = Math.floor(Math.random() * people.length);
-              attr = people[type];
+            type = Math.floor(Math.random() * people.length);
+            attr = people[type];
           }
 
           if (userSelection === 'starships') {
@@ -63,24 +67,22 @@
           }
 
           var clean_attr = attr.replace('_', ' ');
-          // console.log(data.results[index]);
           var question = 'What is the ' + clean_attr + ' of ' + data.results[index].name + '?';
-          // console.log(question);
           var correct = data.results[index][attr];
           var incorrect = [];
+
           while (incorrect.length < 3) {
             var temp = Math.floor(Math.random() * data.results.length);
-            //console.log(temp);
             if (temp !== index) {
               if (data.results[temp][attr] !== correct) incorrect.push(data.results[temp][attr]);
             }
-            // console.log(incorrect);
           }
+
           questions.push({q: question, a: correct, w: incorrect});
           $('#quiz').append('<p>' + question + '</p>');
-          $('#quiz').append('<button id=\'correct\'>' + correct + '</button>');
+          $('#quiz').append('<button class=\'btn btn-default btn-block\' id=\'correct\'>' + correct + '</button>');
           for (var i = 0; i < 3; i++) {
-            $('#quiz').append('<button class=\'incorrect\'>' + incorrect[i] + '</button>');
+            $('#quiz').append('<button class=\'incorrect btn btn-default btn-block\'>' + incorrect[i] + '</button>');
           }
 
           $('#correct').click(function() {
@@ -98,43 +100,43 @@
 
       function startQuiz() {
         generateQ();
-        console.log('start');
         var count = 0;
-
         $('#quiz').show();
       }
 
       $('#people-btn').click(function() {
         userSelection = 'people';
+        $('#main-page').hide();
         $('#quiz-options').hide();
         startQuiz();
       });
 
       $('#starships-btn').click(function() {
         userSelection = 'starships';
+        $('#main-page').hide();
         $('#quiz-options').hide();
         startQuiz();
       });
 
       $('#species-btn').click(function() {
         userSelection = 'species';
+        $('#main-page').hide();
         $('#quiz-options').hide();
         startQuiz();
       });
 
       $('#planets-btn').click(function() {
         userSelection = 'planets';
+        $('#main-page').hide();
         $('#quiz-options').hide();
         startQuiz();
       });
 
       $('#next').click(function() {
-        console.log('next');
         $('#quiz').html('');
         if (questionsAsked !== numQuestions) {
           generateQ();
           $('#next').hide();
-          console.log(questionsCorrect, questionsAsked);
         }
         else {
           $('#quiz').html('<p>You\'re score is ' + questionsCorrect + ' out of ' + questionsAsked + '</p>');
