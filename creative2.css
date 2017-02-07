@@ -1,5 +1,16 @@
+body {
+  background-color: black !important;
+}
+
+h1 {
+  font-size: 50px !important;
+  font-weight: 900 !important;
+  color: yellow !important;
+}
+
 p {
   font-size: 20px;
+  color: yellow;
 }
 
 .container{
