@@ -34,7 +34,6 @@
 
     $(document).ready(function() {
       var numQuestions = 5;
-      var questions = [];
       var questionsAsked = 0;
       var questionsCorrect = 0;
 
@@ -43,44 +42,99 @@
           var index = Math.floor(Math.random() * data.results.length);
           var type;
           var attr;
+          var clean_attr;
+          var question;
 
           if (userSelection === 'people') {
             type = Math.floor(Math.random() * people.length);
             attr = people[type];
+            clean_attr = attr.replace('_', ' ');
+            question = 'What is the ' + clean_attr + ' of ' + data.results[index].name + '?';
           }
-
-          if (userSelection === 'starships') {
+          else if (userSelection === 'starships') {
             type = Math.floor(Math.random() * starships.length);
             attr = starships[type];
+            clean_attr = attr.replace('_', ' ');
+            question = 'What is the ' + clean_attr + ' of ' + data.results[index].name + '?';
           }
-
-          if (userSelection === 'species') {
+          else if (userSelection === 'species') {
             type = Math.floor(Math.random() * species.length);
             attr = species[type];
+            clean_attr = attr.replace('_', ' ');
+            question = 'What is the ' + clean_attr + ' of the ' + data.results[index].name + ' species?';
           }
-
-          if (userSelection === 'planets') {
+          else if (userSelection === 'planets') {
             type = Math.floor(Math.random() * planets.length);
             attr = planets[type];
+            clean_attr = attr.replace('_', ' ');
+            question = 'What is the ' + clean_attr + ' of ' + data.results[index].name + '?';
           }
 
-          var clean_attr = attr.replace('_', ' ');
-          var question = 'What is the ' + clean_attr + ' of ' + data.results[index].name + '?';
-          var correct = data.results[index][attr];
-          var incorrect = [];
+          var answers = [];
+          answers.push(data.results[index][attr]);
 
-          while (incorrect.length < 3) {
+          while (answers.length < 4) {
             var temp = Math.floor(Math.random() * data.results.length);
-            if (temp !== index) {
-              if (data.results[temp][attr] !== correct) incorrect.push(data.results[temp][attr]);
-            }
+            if ($.inArray(data.results[temp][attr], answers) === -1) answers.push(data.results[temp][attr]);
           }
 
-          questions.push({q: question, a: correct, w: incorrect});
+          switch(attr) {
+            case 'mass':
+              for (var i = 0; i < answers.length; i++) {
+                answers[i] = answers[i] + ' kg';
+              }
+              break;
+
+            case 'height':
+              for (var i = 0; i < answers.length; i++) {
+                answers[i] = answers[i] + ' cm';
+              }
+              break;
+
+            case 'cargo_capacity':
+              for (var i = 0; i < answers.length; i++) {
+                answers[i] = answers[i] + ' kg';
+              }
+              break;
+
+            case 'length':
+              for (var i = 0; i < answers.length; i++) {
+                answers[i] = answers[i] + ' m';
+              }
+              break;
+
+            case 'average_height':
+              for (var i = 0; i < answers.length; i++) {
+                answers[i] = answers[i] + ' cm';
+              }
+              break;
+
+            case 'average_lifespan':
+              for (var i = 0; i < answers.length; i++) {
+                answers[i] = answers[i] + ' years';
+              }
+              break;
+
+            case 'diameter':
+              for (var i = 0; i < answers.length; i++) {
+                answers[i] = answers[i] + ' km';
+              }
+              break;
+          }
+
           $('#quiz').append('<p>' + question + '</p>');
-          $('#quiz').append('<button class=\'btn btn-default btn-block\' id=\'correct\'>' + correct + '</button>');
-          for (var i = 0; i < 3; i++) {
-            $('#quiz').append('<button class=\'incorrect btn btn-default btn-block\'>' + incorrect[i] + '</button>');
+
+          // generate html strings
+          var strs = []
+          strs.push('<button class=\'btn btn-default btn-block\' id=\'correct\'>' + answers[0] + '</button>');
+          for (var i = 1; i < 4; i++) {
+            strs.push('<button class=\'incorrect btn btn-default btn-block\'>' + answers[i] + '</button>');
+          }
+
+          // randomize order of answers
+          for (var i = 0; i < 4; i++) {
+            var temp = Math.floor(Math.random() * strs.length);
+            $('#quiz').append(strs.splice(temp,1));
           }
 
           $('#correct').click(function() {
